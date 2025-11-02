@@ -1,30 +1,82 @@
 ---
-- name: Configure HTTP Load Balancer
+- name: Configure HTTPS Load Balancer with SSL
   hosts: azure_proxy
   become: true
   gather_facts: true
+  vars:
+    domain_name: "nginx-lb-e9cx0pxb.westeurope.cloudapp.azure.com"
+    certbot_email: "junaid.sadiq009@gmail.com"
+    enable_ssl: true
+  
   tasks:
     - name: Update package lists on Load Balancer
       apt:
         update_cache: yes
       when: ansible_os_family == 'Debian'
 
-    - name: Install Nginx on Load Balancer
+    - name: Install required packages
       apt:
-        name: nginx
+        name:
+          - nginx
+          - certbot
+          - python3-certbot-nginx
         state: present
       when: ansible_os_family == 'Debian'
 
-    - name: Copy nginx_proxy.conf to Load Balancer
-      copy:
-        src: files/nginx_proxy.conf
+    - name: Copy temporary HTTP nginx config (for certbot verification)
+      template:
+        src: templates/nginx_http_temp.conf.j2
         dest: /etc/nginx/nginx.conf
+      when: enable_ssl
+
+    - name: Restart Nginx for HTTP verification
+      service:
+        name: nginx
+        state: restarted
+      when: enable_ssl
+
+    - name: Obtain SSL certificate with certbot
+      command: >
+        certbot certonly --nginx --non-interactive --agree-tos
+        --email {{ certbot_email }}
+        -d {{ domain_name }}
+      args:
+        creates: /etc/letsencrypt/live/{{ domain_name }}/fullchain.pem
+      when: enable_ssl
+      register: certbot_result
+      ignore_errors: yes
+
+    - name: Display certbot result
+      debug:
+        var: certbot_result
+      when: enable_ssl
+
+    - name: Copy final nginx_proxy.conf with SSL to Load Balancer
+      template:
+        src: templates/nginx_proxy_ssl.conf.j2
+        dest: /etc/nginx/nginx.conf
+      when: enable_ssl and certbot_result is succeeded
       notify:
         - Restart Nginx
 
+    - name: Copy nginx_proxy.conf without SSL (fallback)
+      copy:
+        src: files/nginx_proxy.conf
+        dest: /etc/nginx/nginx.conf
+      when: not enable_ssl or certbot_result is failed
+      notify:
+        - Restart Nginx
+
+    - name: Setup automatic certificate renewal
+      cron:
+        name: "Renew Let's Encrypt certificates"
+        minute: "0"
+        hour: "3"
+        job: "certbot renew --quiet --post-hook 'systemctl reload nginx'"
+      when: enable_ssl and certbot_result is succeeded
+
   handlers:
     - name: Restart Nginx
-      become: yes
       service:
         name: nginx
         state: restarted

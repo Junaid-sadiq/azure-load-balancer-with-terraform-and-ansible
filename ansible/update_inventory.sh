@@ -74,6 +74,30 @@ EOF
 
 echo "✅ nginx_proxy.conf updated!"
 echo ""
+echo "Updating group_vars with domain and backend IPs..."
+
+cat > ../ansible/group_vars/azure_proxy.yml <<EOF
+# Auto-generated from Terraform outputs
+# Variables for Load Balancer (azure_proxy group)
+
+# Your Azure FQDN
+domain_name: "${LB_FQDN}"
+
+# Your email for Let's Encrypt notifications (UPDATE THIS!)
+certbot_email: "junaid.sadiq009@gmail.com"
+
+# Enable or disable SSL
+enable_ssl: true
+
+# Backend server IPs
+backend_servers:
+  - "${IPS_ARRAY[0]}"
+  - "${IPS_ARRAY[1]}"
+  - "${IPS_ARRAY[2]}"
+EOF
+
+echo "✅ group_vars updated!"
+echo ""
 echo "Next steps:"
 echo "1. Save SSH private key: terraform output -raw ssh_private_key > ~/.ssh/azure_lb_key && chmod 600 ~/.ssh/azure_lb_key"
 echo "2. Test connection: ssh ${USERNAME}@${LB_IP}"

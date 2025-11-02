@@ -3,8 +3,15 @@
 ## Overview
 
 This Ansible playbook configures:
-- **VM-1**: Nginx as a load balancer (reverse proxy)
+- **VM-1**: Nginx as a load balancer with SSL/HTTPS support (reverse proxy)
 - **VM-2, VM-3, VM-4**: Nginx web servers serving custom HTML pages
+
+## 🔒 SSL/HTTPS Support
+
+The playbook automatically installs free SSL certificates from Let's Encrypt!
+
+**Quick SSL Setup:** See [QUICK_SSL_SETUP.md](QUICK_SSL_SETUP.md)  
+**Detailed Guide:** See [SSL_SETUP.md](SSL_SETUP.md)
 
 ## Prerequisites
 

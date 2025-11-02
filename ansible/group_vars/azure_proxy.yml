@@ -1,0 +1,17 @@
+# Auto-generated from Terraform outputs
+# Variables for Load Balancer (azure_proxy group)
+
+# Your Azure FQDN
+domain_name: "nginx-lb-e9cx0pxb.westeurope.cloudapp.azure.com"
+
+# Your email for Let's Encrypt notifications
+certbot_email: "junaid.sadiq009@gmail.com"
+
+# Enable or disable SSL
+enable_ssl: true
+
+# Backend server IPs
+backend_servers:
+  - "10.0.1.5"
+  - "10.0.1.4"
+  - "10.0.1.6"
