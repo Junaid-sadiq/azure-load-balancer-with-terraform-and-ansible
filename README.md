@@ -272,8 +272,8 @@ You should see responses from different backend VMs (10.0.1.5, 10.0.1.4, 10.0.1.
 │   ├── main.tf                        # Infrastructure definition
 │   ├── providers.tf                   # Provider configuration
 │   ├── variables.tf                   # Input variables
-│   ├── outputs.tf                     # Output values
-│   └── README.md                      # Terraform documentation
+│   ├── outputs.tf                     # Output values                    
+# Terraform documentation
 └── ansible/
     ├── pb.yml                         # Main playbook
     ├── ansible.cfg                    # Ansible configuration
@@ -289,9 +289,7 @@ You should see responses from different backend VMs (10.0.1.5, 10.0.1.4, 10.0.1.
     │   ├── index.html.j2              # Backend HTML template
     │   ├── nginx_http_temp.conf.j2    # Temp HTTP config
     │   └── nginx_proxy_ssl.conf.j2    # LB nginx config (HTTPS)
-    ├── README.md                      # Ansible documentation
     ├── SSL_SETUP.md                   # Detailed SSL guide
-    └── QUICK_SSL_SETUP.md             # Quick SSL guide
 ```
 
 ## 🧪 Testing Load Balancing
@@ -416,13 +414,4 @@ This will remove:
 - Public IP
 - Everything created by Terraform
 
-**Note**: SSL certificates are stored on VMs and will be deleted.
-
-## 📚 Additional Documentation
-
-- **Terraform Setup**: See `terraform/README.md`
-- **Ansible Configuration**: See `ansible/README.md`
-- **SSL Setup Guide**: See `ansible/SSL_SETUP.md`
-- **Quick SSL Setup**: See `ansible/QUICK_SSL_SETUP.md`
-- **SSL Summary**: See `SSL_SUMMARY.md`
 
