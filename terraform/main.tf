@@ -265,29 +265,3 @@ resource "azurerm_linux_virtual_machine" "backend_vm" {
   }
 }
 
-# Outputs
-output "resource_group_name" {
-  value = azurerm_resource_group.rg.name
-}
-
-output "lb_public_ip_address" {
-  value = azurerm_public_ip.lb_public_ip.ip_address
-}
-
-output "lb_fqdn" {
-  value       = azurerm_public_ip.lb_public_ip.fqdn
-  description = "Fully qualified domain name for the load balancer"
-}
-
-output "backend_vm_private_ips" {
-  value = azurerm_network_interface.backend_nic[*].private_ip_address
-}
-
-output "ssh_private_key" {
-  value     = azapi_resource_action.ssh_public_key_gen.output.privateKey
-  sensitive = true
-}
-
-output "ssh_public_key" {
-  value = azapi_resource_action.ssh_public_key_gen.output.publicKey
-}
