@@ -7,6 +7,10 @@ resource "random_pet" "rg_name" {
 resource "azurerm_resource_group" "rg" {
   name     = random_pet.rg_name.id
   location = var.resource_group_location
+  tags = {
+    environment = "assignment"
+    project     = "nginx-load-balancer"
+  }
 }
 
 # Virtual Network
@@ -182,6 +186,7 @@ resource "azurerm_linux_virtual_machine" "lb_vm" {
   location            = azurerm_resource_group.rg.location
   size                = "Standard_B1s"
   admin_username      = var.username
+  computer_name       = "lb-vm"
   network_interface_ids = [
     azurerm_network_interface.lb_nic.id,
   ]
@@ -206,6 +211,11 @@ resource "azurerm_linux_virtual_machine" "lb_vm" {
 
   boot_diagnostics {
     storage_account_uri = azurerm_storage_account.storage_account.primary_blob_endpoint
+  }
+
+  tags = {
+    environment = "assignment"
+    role        = "load-balancer"
   }
 }
 
@@ -238,6 +248,7 @@ resource "azurerm_linux_virtual_machine" "backend_vm" {
   location            = azurerm_resource_group.rg.location
   size                = "Standard_B1s"
   admin_username      = var.username
+  computer_name       = "backend-vm-${count.index + 2}"
   network_interface_ids = [
     azurerm_network_interface.backend_nic[count.index].id,
   ]
@@ -262,6 +273,11 @@ resource "azurerm_linux_virtual_machine" "backend_vm" {
 
   boot_diagnostics {
     storage_account_uri = azurerm_storage_account.storage_account.primary_blob_endpoint
+  }
+
+  tags = {
+    environment = "assignment"
+    role        = "backend-webserver"
   }
 }
 

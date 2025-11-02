@@ -1,0 +1,60 @@
+---
+- name: Configure HTTP Load Balancer
+  hosts: azure_proxy
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Update package lists on Load Balancer
+      apt:
+        update_cache: yes
+      when: ansible_os_family == 'Debian'
+
+    - name: Install Nginx on Load Balancer
+      apt:
+        name: nginx
+        state: present
+      when: ansible_os_family == 'Debian'
+
+    - name: Copy nginx_proxy.conf to Load Balancer
+      copy:
+        src: files/nginx_proxy.conf
+        dest: /etc/nginx/nginx.conf
+      notify:
+        - Restart Nginx
+
+  handlers:
+    - name: Restart Nginx
+      become: yes
+      service:
+        name: nginx
+        state: restarted
+
+- name: Configure webserver with nginx
+  hosts: azure_vms
+  become: True
+  tasks:
+    - name: Ensure nginx is installed
+      package:
+        name: nginx
+        state: present
+
+    - name: Copy nginx config file
+      copy:
+        src: files/nginx.conf
+        dest: /etc/nginx/sites-available/default
+
+    - name: Enable configuration
+      file:
+        dest: /etc/nginx/sites-enabled/default
+        src: /etc/nginx/sites-available/default
+        state: link
+
+    - name: Copy index.html
+      template:
+        src: templates/index.html.j2
+        dest: /usr/share/nginx/html/index.html
+
+    - name: Restart nginx
+      service:
+        name: nginx
+        state: restarted
